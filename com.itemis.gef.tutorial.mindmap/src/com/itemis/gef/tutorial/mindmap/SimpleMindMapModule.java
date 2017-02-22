@@ -17,9 +17,11 @@ import org.eclipse.gef.mvc.fx.providers.ShapeBoundsProvider;
 import org.eclipse.gef.mvc.fx.providers.ShapeOutlineProvider;
 
 import com.google.inject.multibindings.MapBinder;
+import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapNodePart;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapPartsFactory;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapAnchorProvider;
+import com.itemis.gef.tutorial.mindmap.policies.CreateNewNodeOnClickHandler;
 
 /**
  * The Guice Module to configure our parts and behaviors.
@@ -44,6 +46,21 @@ public class SimpleMindMapModule extends MvcFxModule {
 	protected void bindIContentPartFactoryAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
 		// bind MindMapPartsFactory adapter to the content viewer
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(MindMapPartsFactory.class);
+	}
+
+	@Override
+	protected void bindIRootPartAdaptersForContentViewer(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
+		super.bindIRootPartAdaptersForContentViewer(adapterMapBinder);
+
+		// support creation of nodes via mouse click
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(CreateNewNodeOnClickHandler.class);
+	}
+
+	@Override
+	protected void bindIViewerAdaptersForContentViewer(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
+		super.bindIViewerAdaptersForContentViewer(adapterMapBinder);
+		// add ItemCreationModel adapter binding
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(ItemCreationModel.class);
 	}
 
 	/**
