@@ -4,7 +4,6 @@ import org.eclipse.gef.geometry.planar.Rectangle;
 import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
 import org.eclipse.gef.mvc.fx.handlers.IOnClickHandler;
 import org.eclipse.gef.mvc.fx.parts.IContentPart;
-import org.eclipse.gef.mvc.fx.parts.IRootPart;
 import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 import org.eclipse.gef.mvc.fx.policies.CreationPolicy;
 import org.eclipse.gef.mvc.fx.viewer.IViewer;
@@ -23,7 +22,6 @@ import javafx.scene.paint.Color;
 /**
  * Policy, which listens to primary clicks and creates a new node if the
  * {@link ItemCreationModel} is in the right state.
- *
  *
  */
 public class CreateNewNodeOnClickHandler extends AbstractHandler implements IOnClickHandler {
@@ -58,8 +56,7 @@ public class CreateNewNodeOnClickHandler extends AbstractHandler implements IOnC
 			newNode.setBounds(new Rectangle(mouseInLocal.getX(), mouseInLocal.getY(), 120, 80));
 
 			// GEF provides the CreatePolicy to add a new element to the model
-			IRootPart<? extends Node> root = getHost().getRoot();
-			CreationPolicy creationPolicy = root.getAdapter(CreationPolicy.class);
+			CreationPolicy creationPolicy = getHost().getRoot().getAdapter(CreationPolicy.class);
 			init(creationPolicy);
 			// create a IContentPart for our new model. The newly created
 			// IContentPart is returned, but we do not need it.
@@ -68,7 +65,7 @@ public class CreateNewNodeOnClickHandler extends AbstractHandler implements IOnC
 			commit(creationPolicy);
 		}
 
-		// clear the creation selection
+		// reset creation state
 		creationModel.setType(Type.None);
 	}
 }

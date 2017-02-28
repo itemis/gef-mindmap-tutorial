@@ -21,6 +21,7 @@ import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapNodePart;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapPartsFactory;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapAnchorProvider;
+import com.itemis.gef.tutorial.mindmap.policies.CreateNewConnectionOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewNodeOnClickHandler;
 
 /**
@@ -93,6 +94,9 @@ public class SimpleMindMapModule extends MvcFxModule {
 
 		// support resizing nodes
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(ResizePolicy.class);
+
+		// support creation of connections
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(CreateNewConnectionOnClickHandler.class);
 	}
 
 	/**

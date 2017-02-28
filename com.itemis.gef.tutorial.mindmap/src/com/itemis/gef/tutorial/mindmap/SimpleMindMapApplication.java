@@ -97,6 +97,14 @@ public class SimpleMindMapApplication extends Application {
 			creationModel.setType(newVal ? Type.Node : Type.None);
 		});
 
+		ToggleButton createConn = new ToggleButton("New Connection");
+		createConn.setToggleGroup(toggleGroup);
+		createConn.setMaxWidth(Double.MAX_VALUE);
+		createConn.setMinHeight(50);
+		createConn.selectedProperty().addListener((e, oldVal, newVal) -> {
+			creationModel.setType(newVal ? Type.Connection : Type.None);
+		});
+
 		// now listen to changes in the model, and deactivate buttons, if
 		// necessary
 		creationModel.getTypeProperty().addListener((e, oldVal, newVal) -> {
@@ -109,7 +117,7 @@ public class SimpleMindMapApplication extends Application {
 			}
 		});
 
-		return new VBox(20, createNode);
+		return new VBox(20, createNode, createConn);
 	}
 
 	/**
