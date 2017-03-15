@@ -1,5 +1,7 @@
 package com.itemis.gef.tutorial.mindmap.parts;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,12 +24,24 @@ import javafx.scene.transform.Translate;
  * {@link MindMapNodeVisual} for a instance of the {@link MindMapNode}.
  *
  */
-public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual>
-		implements ITransformableContentPart<MindMapNodeVisual>, IResizableContentPart<MindMapNodeVisual> {
+public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual> implements
+		ITransformableContentPart<MindMapNodeVisual>, IResizableContentPart<MindMapNodeVisual>, PropertyChangeListener {
+
+	@Override
+	protected void doActivate() {
+		super.doActivate();
+		getContent().addPropertyChangeListener(this);
+	}
 
 	@Override
 	protected MindMapNodeVisual doCreateVisual() {
 		return new MindMapNodeVisual();
+	}
+
+	@Override
+	protected void doDeactivate() {
+		getContent().removePropertyChangeListener(this);
+		super.doDeactivate();
 	}
 
 	@Override
@@ -70,6 +84,15 @@ public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual>
 	public Affine getContentTransform() {
 		Rectangle bounds = getContent().getBounds();
 		return new Affine(new Translate(bounds.getX(), bounds.getY()));
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		String prop = event.getPropertyName();
+		if (MindMapNode.PROP_COLOR.equals(prop) || MindMapNode.PROP_DESCRIPTION.equals(prop)
+				|| MindMapNode.PROP_TITLE.equals(prop)) {
+			refreshVisual();
+		}
 	}
 
 	@Override
