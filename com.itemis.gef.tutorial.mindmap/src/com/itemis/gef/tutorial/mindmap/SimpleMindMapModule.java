@@ -17,10 +17,12 @@ import org.eclipse.gef.mvc.fx.providers.ShapeBoundsProvider;
 import org.eclipse.gef.mvc.fx.providers.ShapeOutlineProvider;
 
 import com.google.inject.multibindings.MapBinder;
+import com.itemis.gef.tutorial.mindmap.behaviors.CreateFeedbackBehavior;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapNodePart;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapPartsFactory;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapAnchorProvider;
+import com.itemis.gef.tutorial.mindmap.parts.feedback.CreateFeedbackPartFactory;
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewConnectionOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewNodeOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.ShowMindMapNodeContextMenuOnClickHandler;
@@ -56,6 +58,9 @@ public class SimpleMindMapModule extends MvcFxModule {
 
 		// support creation of nodes via mouse click
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(CreateNewNodeOnClickHandler.class);
+
+		// adding the creation feedback behavior
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(CreateFeedbackBehavior.class);
 	}
 
 	@Override
@@ -63,6 +68,11 @@ public class SimpleMindMapModule extends MvcFxModule {
 		super.bindIViewerAdaptersForContentViewer(adapterMapBinder);
 		// add ItemCreationModel adapter binding
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(ItemCreationModel.class);
+
+		// binding the creation feedback part factory using the role that is
+		// specified in the behavior
+		AdapterKey<?> role = AdapterKey.role(CreateFeedbackBehavior.CREATE_FEEDBACK_PART_FACTORY);
+		adapterMapBinder.addBinding(role).to(CreateFeedbackPartFactory.class);
 	}
 
 	/**
