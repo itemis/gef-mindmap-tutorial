@@ -5,8 +5,14 @@ import org.eclipse.gef.common.adapt.inject.AdapterMaps;
 import org.eclipse.gef.mvc.fx.MvcFxModule;
 import org.eclipse.gef.mvc.fx.handlers.FocusAndSelectOnClickHandler;
 import org.eclipse.gef.mvc.fx.handlers.HoverOnHoverHandler;
+import org.eclipse.gef.mvc.fx.handlers.ResizeTranslateFirstAnchorageOnHandleDragHandler;
+import org.eclipse.gef.mvc.fx.handlers.TranslateSelectedOnDragHandler;
 import org.eclipse.gef.mvc.fx.parts.DefaultHoverFeedbackPartFactory;
 import org.eclipse.gef.mvc.fx.parts.DefaultSelectionFeedbackPartFactory;
+import org.eclipse.gef.mvc.fx.parts.DefaultSelectionHandlePartFactory;
+import org.eclipse.gef.mvc.fx.parts.SquareSegmentHandlePart;
+import org.eclipse.gef.mvc.fx.policies.ResizePolicy;
+import org.eclipse.gef.mvc.fx.policies.TransformPolicy;
 import org.eclipse.gef.mvc.fx.providers.ShapeBoundsProvider;
 import org.eclipse.gef.mvc.fx.providers.ShapeOutlineProvider;
 
@@ -58,6 +64,29 @@ public class SimpleMindMapModule extends MvcFxModule {
 		// provides a selection feedback to the shape
 		role = AdapterKey.role(DefaultSelectionFeedbackPartFactory.SELECTION_FEEDBACK_GEOMETRY_PROVIDER);
 		adapterMapBinder.addBinding(role).to(ShapeBoundsProvider.class);
+
+		// support moving nodes via mouse drag
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(TransformPolicy.class);
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(TranslateSelectedOnDragHandler.class);
+
+		// specify the factory to create the geometry object for the selection
+		// handles
+		role = AdapterKey.role(DefaultSelectionHandlePartFactory.SELECTION_HANDLES_GEOMETRY_PROVIDER);
+		adapterMapBinder.addBinding(role).to(ShapeBoundsProvider.class);
+
+		// support resizing nodes
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(ResizePolicy.class);
+	}
+
+	/**
+	 * Binds the parts of the selection handles (the squares in the corner) to
+	 * policies
+	 *
+	 * @param adapterMapBinder
+	 */
+	protected void bindSquareSegmentHandlePartPartAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
+		adapterMapBinder.addBinding(AdapterKey.defaultRole())
+				.to(ResizeTranslateFirstAnchorageOnHandleDragHandler.class);
 	}
 
 	@Override
@@ -66,5 +95,9 @@ public class SimpleMindMapModule extends MvcFxModule {
 		super.configure();
 
 		bindMindMapNodePartAdapters(AdapterMaps.getAdapterMapBinder(binder(), MindMapNodePart.class));
+
+		// with this binding we create the handles
+		bindSquareSegmentHandlePartPartAdapter(
+				AdapterMaps.getAdapterMapBinder(binder(), SquareSegmentHandlePart.class));
 	}
 }
