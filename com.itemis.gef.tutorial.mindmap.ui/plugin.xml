@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+		point="org.eclipse.ui.editors">
+		<editor
+			id="com.itemis.gef.tutorial.mindmap.ui.simplemindmapeditor"
+			name="Simple Mind Map Editor"
+			extensions="smm"
+			class="com.itemis.gef.tutorial.mindmap.ui.editor.SimpleMindMapEditor"
+			default="false">
+		</editor>
+	</extension>
+</plugin>
