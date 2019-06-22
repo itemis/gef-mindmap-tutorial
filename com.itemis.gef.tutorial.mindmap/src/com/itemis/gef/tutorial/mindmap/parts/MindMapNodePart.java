@@ -12,10 +12,14 @@ import org.eclipse.gef.mvc.fx.parts.IResizableContentPart;
 import org.eclipse.gef.mvc.fx.parts.ITransformableContentPart;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.itemis.gef.tutorial.mindmap.model.MindMapNode;
+import com.itemis.gef.tutorial.mindmap.models.IInlineEditableField;
+import com.itemis.gef.tutorial.mindmap.models.InlineEditableTextField;
 import com.itemis.gef.tutorial.mindmap.visuals.MindMapNodeVisual;
 
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Translate;
@@ -25,8 +29,9 @@ import javafx.scene.transform.Translate;
  * {@link MindMapNodeVisual} for a instance of the {@link MindMapNode}.
  *
  */
-public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual> implements
-		ITransformableContentPart<MindMapNodeVisual>, IResizableContentPart<MindMapNodeVisual>, PropertyChangeListener {
+public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual>
+		implements ITransformableContentPart<MindMapNodeVisual>, IResizableContentPart<MindMapNodeVisual>,
+		PropertyChangeListener, IInlineEditablePart {
 
 	@Override
 	protected void doActivate() {
@@ -72,6 +77,12 @@ public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual> impl
 	}
 
 	@Override
+	public void endEditing(IInlineEditableField field) {
+		getVisual().endEditing(field.getPropertyName());
+		field.setEditorNode(null);
+	}
+
+	@Override
 	public MindMapNode getContent() {
 		return (MindMapNode) super.getContent();
 	}
@@ -85,6 +96,14 @@ public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual> impl
 	public Affine getContentTransform() {
 		Rectangle bounds = getContent().getBounds();
 		return new Affine(new Translate(bounds.getX(), bounds.getY()));
+	}
+
+	@Override
+	public List<IInlineEditableField> getEditableFields() {
+		List<IInlineEditableField> fields = Lists.newArrayList();
+		fields.add(new InlineEditableTextField("title", getVisual().getTitleText(), false));
+		fields.add(new InlineEditableTextField("description", getVisual().getDescriptionText(), true));
+		return fields;
 	}
 
 	@Override
@@ -120,5 +139,22 @@ public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual> impl
 		if (parent != null) {
 			parent.layout();
 		}
+	}
+
+	@Override
+	public void startEditing(IInlineEditableField field) {
+		Node editor = getVisual().startEditing(field.getPropertyName());
+		field.setEditorNode(editor);
+	}
+
+	@Override
+	public void submitEditingValue(IInlineEditableField field, Object value) {
+		if ("title".equals(field.getPropertyName())) {
+			getContent().setTitle((String) value);
+		} else if ("description".equals(field.getPropertyName())) {
+			getContent().setDescription((String) value);
+		}
+
+		doRefreshVisual(getVisual());
 	}
 }

@@ -3,10 +3,15 @@ package com.itemis.gef.tutorial.mindmap.visuals;
 import org.eclipse.gef.fx.nodes.GeometryNode;
 import org.eclipse.gef.geometry.planar.RoundedRectangle;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -119,5 +124,47 @@ public class MindMapNodeVisual extends Region {
 
 	public void setTitle(String title) {
 		this.titleText.setText(title);
+	}
+
+	public Node startEditing(String propertyName) {
+		TextInputControl inputControl = null;
+		int idx = 0;
+		double width = shape.getBoundsInLocal().getWidth();
+		double height = titleText.getBoundsInLocal().getHeight();
+
+		if (propertyName.equals("title")) {
+			inputControl = new TextField(titleText.getText());
+		} else if (propertyName.equals("description")) {
+			inputControl = new TextArea(descriptionText.getText());
+			idx = 1;
+			height = shape.getBoundsInLocal().getHeight();
+		} else {
+			throw new IllegalArgumentException("Invalid entry");
+		}
+
+		inputControl.setPrefSize(width, height);
+		// TODO: verify labelGroup
+		ObservableList<Node> children = /* labelGroup. */getChildren();
+		children.remove(idx);
+		children.add(idx, inputControl);
+		return inputControl;
+	}
+
+	public void endEditing(String propertyName) {
+		int idx = 0;
+		Node elementToAdd = null;
+		if (propertyName.equals("title")) {
+			elementToAdd = titleText;
+		} else if (propertyName.equals("description")) {
+			elementToAdd = descriptionFlow;
+			idx = 1;
+		} else {
+			throw new IllegalArgumentException("Invalid entry");
+		}
+	
+		// TODO: verify labelGroup
+		ObservableList<Node> children = /* labelGroup. */getChildren();
+		children.remove(idx);
+		children.add(idx, elementToAdd);
 	}
 }

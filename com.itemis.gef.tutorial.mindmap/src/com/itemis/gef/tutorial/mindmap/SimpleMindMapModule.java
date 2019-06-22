@@ -1,6 +1,7 @@
 package com.itemis.gef.tutorial.mindmap;
 
 import org.eclipse.gef.common.adapt.AdapterKey;
+import org.eclipse.gef.common.adapt.inject.AdaptableScopes;
 import org.eclipse.gef.common.adapt.inject.AdapterMaps;
 import org.eclipse.gef.mvc.fx.MvcFxModule;
 import org.eclipse.gef.mvc.fx.behaviors.HoverIntentBehavior;
@@ -17,9 +18,11 @@ import org.eclipse.gef.mvc.fx.policies.ResizePolicy;
 import org.eclipse.gef.mvc.fx.policies.TransformPolicy;
 import org.eclipse.gef.mvc.fx.providers.ShapeBoundsProvider;
 import org.eclipse.gef.mvc.fx.providers.ShapeOutlineProvider;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
 
 import com.google.inject.multibindings.MapBinder;
 import com.itemis.gef.tutorial.mindmap.behaviors.CreateFeedbackBehavior;
+import com.itemis.gef.tutorial.mindmap.models.InlineEditModel;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapNodePart;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapPartsFactory;
@@ -31,6 +34,7 @@ import com.itemis.gef.tutorial.mindmap.parts.handles.MindMapSelectionHandlePartF
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewConnectionOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewNodeOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.DeleteNodeOnHandleClickHandler;
+import com.itemis.gef.tutorial.mindmap.policies.InlineEditOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.ShowMindMapNodeContextMenuOnClickHandler;
 
 /**
@@ -68,6 +72,18 @@ public class SimpleMindMapModule extends MvcFxModule {
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(MindMapPartsFactory.class);
 	}
 
+	protected void bindIInlineEditModelAsContentViewerAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
+		AdapterKey<InlineEditModel> key = AdapterKey.get(InlineEditModel.class);
+		adapterMapBinder.addBinding(key).to(InlineEditModel.class);
+	}
+
+	/**
+	 * Scoping the {@link InlineEditModel} in the {@link IViewer} class
+	 */
+	protected void bindInlineEditModel() {
+		binder().bind(InlineEditModel.class).in(AdaptableScopes.typed(IViewer.class));
+	}
+
 	@Override
 	protected void bindIRootPartAdaptersForContentViewer(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
 		super.bindIRootPartAdaptersForContentViewer(adapterMapBinder);
@@ -89,6 +105,9 @@ public class SimpleMindMapModule extends MvcFxModule {
 		// specified in the behavior
 		AdapterKey<?> role = AdapterKey.role(CreateFeedbackBehavior.CREATE_FEEDBACK_PART_FACTORY);
 		adapterMapBinder.addBinding(role).to(CreateFeedbackPartFactory.class);
+
+		// bind the model to the content viewer
+		bindIInlineEditModelAsContentViewerAdapter(adapterMapBinder);
 	}
 
 	/**
@@ -127,6 +146,10 @@ public class SimpleMindMapModule extends MvcFxModule {
 
 		// bind the context menu policy to the part
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(ShowMindMapNodeContextMenuOnClickHandler.class);
+
+		// adding the inline edit policy to the part to listen to double clicks on
+		// "fields"
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(InlineEditOnClickHandler.class);
 	}
 
 	@Override
@@ -159,5 +182,8 @@ public class SimpleMindMapModule extends MvcFxModule {
 				AdapterMaps.getAdapterMapBinder(binder(), SquareSegmentHandlePart.class));
 		bindDeleteMindMapNodeHandlePartAdapters(
 				AdapterMaps.getAdapterMapBinder(binder(), DeleteMindMapNodeHandlePart.class));
+
+		// scoping the inline edit model
+		bindInlineEditModel();
 	}
 }
