@@ -16,6 +16,7 @@ import com.google.common.collect.SetMultimap;
 import com.itemis.gef.tutorial.mindmap.model.MindMapNode;
 import com.itemis.gef.tutorial.mindmap.visuals.MindMapNodeVisual;
 
+import javafx.scene.Parent;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Translate;
 
@@ -114,6 +115,10 @@ public class MindMapNodePart extends AbstractContentPart<MindMapNodeVisual> impl
 	public void setVisualSize(Dimension totalSize) {
 		IResizableContentPart.super.setVisualSize(totalSize);
 		// perform layout pass to apply size
-		getVisual().getParent().layout();
+		// TODO: check why visual.getParent() returns null
+		Parent parent = getVisual().getParent();
+		if (parent != null) {
+			parent.layout();
+		}
 	}
 }
