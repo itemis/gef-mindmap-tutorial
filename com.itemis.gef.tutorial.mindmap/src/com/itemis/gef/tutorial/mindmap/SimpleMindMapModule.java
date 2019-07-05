@@ -47,11 +47,11 @@ public class SimpleMindMapModule extends MvcFxModule {
 	protected void bindAbstractContentPartAdapters(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
 		super.bindAbstractContentPartAdapters(adapterMapBinder);
 
-		// binding the HoverOnHoverPolicy to every part
-		// if a mouse is moving above a part it is set i the HoverModel
+		// binding the HoverOnHoverHandler to every part
+		// if a mouse is moving above a part it is set in the HoverModel
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(HoverOnHoverHandler.class);
 
-		// add the focus and select policy to every part, listening to clicks
+		// add the focus and select handler to every part, listening to clicks
 		// and changing the focus and selection model
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FocusAndSelectOnClickHandler.class);
 	}
@@ -161,7 +161,7 @@ public class SimpleMindMapModule extends MvcFxModule {
 
 	/**
 	 * Binds the parts of the selection handles (the squares in the corner) to
-	 * policies
+	 * handlers
 	 *
 	 * @param adapterMapBinder
 	 */
