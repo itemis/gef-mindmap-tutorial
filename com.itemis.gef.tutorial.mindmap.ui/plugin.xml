@@ -9,7 +9,7 @@
             extensions="smm"
             id="com.itemis.gef.tutorial.mindmap.ui.simplemindmapeditor"
             name="Simple Mind Map Editor"
-            contributorClass="org.eclipse.gef.mvc.fx.ui.parts.FXEditorActionBarContributor">
+            contributorClass="com.itemis.gef.tutorial.mindmap.ui.editor.EditorActionBarContributor">
       </editor>
    </extension>
 
