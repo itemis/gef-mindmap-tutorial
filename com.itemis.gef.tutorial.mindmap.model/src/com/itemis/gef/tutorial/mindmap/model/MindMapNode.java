@@ -36,7 +36,7 @@ public class MindMapNode extends AbstractMindMapItem implements Serializable {
 	/**
 	 * The background color of the node
 	 */
-	private Color color;
+	transient private Color color;
 
 	/**
 	 * The size and position of the visual representation
