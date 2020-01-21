@@ -31,6 +31,7 @@ import com.itemis.gef.tutorial.mindmap.parts.handles.MindMapSelectionHandlePartF
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewConnectionOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.CreateNewNodeOnClickHandler;
 import com.itemis.gef.tutorial.mindmap.policies.DeleteNodeOnHandleClickHandler;
+import com.itemis.gef.tutorial.mindmap.policies.DeletionPolicyEx;
 import com.itemis.gef.tutorial.mindmap.policies.ShowMindMapNodeContextMenuOnClickHandler;
 
 /**
@@ -54,6 +55,11 @@ public class SimpleMindMapModule extends MvcFxModule {
 
 	protected void bindDeleteMindMapNodeHandlePartAdapters(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
 		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(DeleteNodeOnHandleClickHandler.class);
+	}
+
+	@Override
+	protected void bindDeletionPolicyAsIRootPartAdapter(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
+		adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(DeletionPolicyEx.class);
 	}
 
 	@Override

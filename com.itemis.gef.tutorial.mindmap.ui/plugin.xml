@@ -8,7 +8,8 @@
             default="false"
             extensions="smm"
             id="com.itemis.gef.tutorial.mindmap.ui.simplemindmapeditor"
-            name="Simple Mind Map Editor">
+            name="Simple Mind Map Editor"
+            contributorClass="org.eclipse.gef.mvc.fx.ui.parts.FXEditorActionBarContributor">
       </editor>
    </extension>
 
