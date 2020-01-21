@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.gef.geometry;bundle-version="5.0.0",
  org.eclipse.gef.fx;bundle-version="5.0.0",
  org.eclipse.gef.common;bundle-version="5.0.0"
 Export-Package: com.itemis.gef.tutorial.mindmap.visuals
+Automatic-Module-Name: com.itemis.gef.tutorial.mindmap.visuals
