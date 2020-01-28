@@ -14,6 +14,7 @@ import com.itemis.gef.tutorial.mindmap.model.SimpleMindMapExampleFactory;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel.Type;
 import com.itemis.gef.tutorial.mindmap.operations.GefLayoutOperation;
+import com.itemis.gef.tutorial.mindmap.operations.DotLayoutOperation;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapPart;
 import com.itemis.gef.tutorial.mindmap.visuals.MindMapNodeVisual;
 
