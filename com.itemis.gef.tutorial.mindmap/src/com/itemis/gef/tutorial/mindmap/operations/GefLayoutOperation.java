@@ -18,13 +18,14 @@ import org.eclipse.gef.geometry.planar.Rectangle;
 import org.eclipse.gef.graph.Edge;
 import org.eclipse.gef.graph.Graph;
 import org.eclipse.gef.graph.Node;
+import org.eclipse.gef.layout.ILayoutAlgorithm;
 import org.eclipse.gef.layout.LayoutContext;
 import org.eclipse.gef.layout.LayoutProperties;
+import org.eclipse.gef.layout.algorithms.TreeLayoutAlgorithm;
 import org.eclipse.gef.mvc.fx.operations.ITransactionalOperation;
 import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 
 import com.google.common.collect.Maps;
-import com.itemis.gef.tutorial.mindmap.layout.DotLayoutAlgorithm;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapConnectionPart;
 import com.itemis.gef.tutorial.mindmap.parts.MindMapNodePart;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapPart;
@@ -33,29 +34,37 @@ import com.itemis.gef.tutorial.mindmap.visuals.MindMapNodeVisual;
 import javafx.geometry.Bounds;
 
 /**
- * Operation to layout the mind map automatically using
- * {@link DotLayoutAlgorithm}.
+ * Operation to layout the mind map automatically using GEF
+ * {@link TreeLayoutAlgorithm}.
  */
-<<<<<<< HEAD:com.itemis.gef.tutorial.mindmap/src/com/itemis/gef/tutorial/mindmap/operations/GefLayoutOperation.java
 public class GefLayoutOperation extends AbstractOperation implements ITransactionalOperation {
-=======
-public class DotLayoutOperation extends AbstractOperation implements ITransactionalOperation {
->>>>>>> 11381f3... Step 18: Automatic Layout via Graphviz Dot.:com.itemis.gef.tutorial.mindmap/src/com/itemis/gef/tutorial/mindmap/operations/DotLayoutOperation.java
 
-	public static final String NODE_ID_ATTR = "ID";
-
-	private int name;
 	private SimpleMindMapPart mindMapPart;
 	private Map<MindMapNodePart, Point> finalLocations;
 	private Map<MindMapNodePart, Point> initialLocations;
 
-<<<<<<< HEAD:com.itemis.gef.tutorial.mindmap/src/com/itemis/gef/tutorial/mindmap/operations/GefLayoutOperation.java
 	public GefLayoutOperation(SimpleMindMapPart part) {
-=======
-	public DotLayoutOperation(SimpleMindMapPart part) {
->>>>>>> 11381f3... Step 18: Automatic Layout via Graphviz Dot.:com.itemis.gef.tutorial.mindmap/src/com/itemis/gef/tutorial/mindmap/operations/DotLayoutOperation.java
-		super("Layout Mindmap");
+		this("Layout Mindmap (Tree)", part);
+	}
+
+	protected GefLayoutOperation(String label, SimpleMindMapPart part) {
+		super(label);
 		this.mindMapPart = part;
+	}
+
+	/**
+	 * Creating the node and setting the attributes for the layout algorithm.
+	 */
+	protected Node createLayoutNode(MindMapNodePart mmNode) {
+		Node node = new Node();
+		Point currLocation = mmNode.getContent().getBounds().getLocation();
+		node.getAttributes().put(LayoutProperties.LOCATION_PROPERTY, currLocation.clone());
+
+		MindMapNodeVisual visual = mmNode.getVisual();
+		Bounds lb = visual.getLayoutBounds();
+		node.getAttributes().put(LayoutProperties.SIZE_PROPERTY, new Dimension(lb.getWidth(), lb.getHeight()));
+		node.getAttributes().put(LayoutProperties.RESIZABLE_PROPERTY, false);
+		return node;
 	}
 
 	@Override
@@ -69,21 +78,14 @@ public class DotLayoutOperation extends AbstractOperation implements ITransactio
 			return nodeMap.get(mmNode);
 		}
 
-		Point currLocation = mmNode.getContent().getBounds().getLocation();
-
-		MindMapNodeVisual visual = mmNode.getVisual();
-		Bounds lb = visual.getLayoutBounds();
-
-		// creating the node and setting the attributes for the layout algorithm
-		Node node = new Node();
-		node.getAttributes().put(LayoutProperties.LOCATION_PROPERTY, currLocation.clone());
-		node.getAttributes().put(LayoutProperties.SIZE_PROPERTY, new Dimension(lb.getWidth(), lb.getHeight()));
-		node.getAttributes().put(LayoutProperties.RESIZABLE_PROPERTY, false);
-		node.getAttributes().put(NODE_ID_ATTR, Integer.toString(name++));
-
+		Node node = createLayoutNode(mmNode);
 		nodeMap.put(mmNode, node);
 
 		return node;
+	}
+
+	protected ILayoutAlgorithm getLayoutAlgorithm() {
+		return new TreeLayoutAlgorithm();
 	}
 
 	@Override
@@ -102,11 +104,11 @@ public class DotLayoutOperation extends AbstractOperation implements ITransactio
 
 		Graph graph = new Graph();
 
-		Map<MindMapNodePart, Node> layoutedNodes = Maps.newHashMap();
+		Map<MindMapNodePart, Node> layoutNodes = Maps.newHashMap();
 
 		for (IVisualPart<? extends javafx.scene.Node> item : mindMapPart.getChildrenUnmodifiable()) {
 			if (item instanceof MindMapNodePart) {
-				graph.getNodes().add(getGraphNode(layoutedNodes, ((MindMapNodePart) item)));
+				graph.getNodes().add(getGraphNode(layoutNodes, ((MindMapNodePart) item)));
 			} else {
 				Node srcNode = null;
 				Node trgNode = null;
@@ -116,9 +118,9 @@ public class DotLayoutOperation extends AbstractOperation implements ITransactio
 
 				for (Entry<IVisualPart<? extends javafx.scene.Node>, String> e : anchorages.entries()) {
 					if (MindMapConnectionPart.START_ROLE.equals(e.getValue())) {
-						srcNode = getGraphNode(layoutedNodes, (MindMapNodePart) e.getKey());
+						srcNode = getGraphNode(layoutNodes, (MindMapNodePart) e.getKey());
 					} else {
-						trgNode = getGraphNode(layoutedNodes, (MindMapNodePart) e.getKey());
+						trgNode = getGraphNode(layoutNodes, (MindMapNodePart) e.getKey());
 					}
 				}
 
@@ -130,17 +132,17 @@ public class DotLayoutOperation extends AbstractOperation implements ITransactio
 		LayoutProperties.setBounds(graph, new Rectangle(0, 0, 800, 500));
 
 		LayoutContext ctx = new LayoutContext();
-		ctx.setLayoutAlgorithm(new DotLayoutAlgorithm());
+		ctx.setLayoutAlgorithm(getLayoutAlgorithm());
 		ctx.setGraph(graph);
 		ctx.applyLayout(true);
 
 		// filling the maps for storing initial and final locations
-		layoutedNodes.forEach((part, node) -> {
+		layoutNodes.forEach((part, node) -> {
 			initialLocations.put(part, part.getContent().getBounds().getLocation());
 			finalLocations.put(part, LayoutProperties.getLocation(node));
 		});
 
-		layoutedNodes.clear();
+		layoutNodes.clear();
 	}
 
 	@Override

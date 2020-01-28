@@ -37,8 +37,8 @@ import javafx.scene.control.ButtonType;
  */
 public class DotLayoutAlgorithm implements ILayoutAlgorithm {
 
-	private String dotExecutablePath = null; // TODO: replace with your dot executable path
-//	private String dotExecutablePath = "/usr/local/bin/dot";
+//	private String dotExecutablePath = null; // TODO: replace with your dot executable path
+	private String dotExecutablePath = "/usr/local/bin/dot";
 //	private String dotExecutablePath = "C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot.exe";
 
 	private Map<String, Node> nameToLayoutNodeMap = new HashMap<>();

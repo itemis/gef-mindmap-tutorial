@@ -13,8 +13,8 @@ import com.itemis.gef.tutorial.mindmap.model.SimpleMindMap;
 import com.itemis.gef.tutorial.mindmap.model.SimpleMindMapExampleFactory;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel.Type;
-import com.itemis.gef.tutorial.mindmap.operations.GefLayoutOperation;
 import com.itemis.gef.tutorial.mindmap.operations.DotLayoutOperation;
+import com.itemis.gef.tutorial.mindmap.operations.GefLayoutOperation;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapPart;
 import com.itemis.gef.tutorial.mindmap.visuals.MindMapNodeVisual;
 
@@ -33,7 +33,6 @@ import javafx.stage.Stage;
 /**
  * Entry point for our Simple Mind Map Editor, creating and rendering a JavaFX
  * Window.
- *
  */
 public class SimpleMindMapApplication extends Application {
 
@@ -45,9 +44,7 @@ public class SimpleMindMapApplication extends Application {
 	private HistoricizingDomain domain;
 
 	/**
-	 * Creates the undo/redo buttons
-	 *
-	 * @return
+	 * Creates the undo/redo buttons.
 	 */
 	private Node createButtonBar() {
 		Button undoButton = new Button("Undo");
@@ -78,18 +75,21 @@ public class SimpleMindMapApplication extends Application {
 			redoButton.setDisable(!e.getHistory().canRedo(ctx));
 		});
 
-		Button layoutButton = new Button("Layout");
-		layoutButton.setOnAction((e) -> {
-			startLayoutOperation();
+		Button treeLayoutButton = new Button("Tree Layout");
+		treeLayoutButton.setOnAction((e) -> {
+			executeOperation(new GefLayoutOperation(getMindmapPart()));
 		});
 
-		return new HBox(10, undoButton, redoButton, layoutButton);
+		Button circoLayoutButton = new Button("Circo Layout");
+		circoLayoutButton.setOnAction((e) -> {
+			executeOperation(new DotLayoutOperation(getMindmapPart()));
+		});
+
+		return new HBox(10, undoButton, redoButton, treeLayoutButton, circoLayoutButton);
 	}
 
 	/**
-	 * Creates the tooling buttons to create new elements
-	 *
-	 * @return
+	 * Creates the tooling buttons to create new elements.
 	 */
 	private Node createToolPalette() {
 		ItemCreationModel creationModel = getContentViewer().getAdapter(ItemCreationModel.class);
@@ -129,13 +129,23 @@ public class SimpleMindMapApplication extends Application {
 		return new VBox(20, createNode, createConn);
 	}
 
+	private void executeOperation(ITransactionalOperation layoutOperation) {
+		try {
+			domain.execute(layoutOperation, null);
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
-	 * Returns the content viewer of the domain
-	 *
-	 * @return
+	 * Returns the content viewer of the domain.
 	 */
 	private IViewer getContentViewer() {
 		return domain.getAdapter(AdapterKey.get(IViewer.class, IDomain.CONTENT_VIEWER_ROLE));
+	}
+
+	private SimpleMindMapPart getMindmapPart() {
+		return (SimpleMindMapPart) getContentViewer().getRootPart().getContentPartChildren().get(0);
 	}
 
 	/**
@@ -172,6 +182,7 @@ public class SimpleMindMapApplication extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		SimpleMindMapModule module = new SimpleMindMapModule();
 		this.primaryStage = primaryStage;
+
 		// create domain using guice
 		this.domain = (HistoricizingDomain) Guice.createInjector(module).getInstance(IDomain.class);
 
@@ -189,16 +200,5 @@ public class SimpleMindMapApplication extends Application {
 		primaryStage.setTitle("GEF Simple Mindmap");
 		primaryStage.sizeToScene();
 		primaryStage.show();
-	}
-
-	private void startLayoutOperation() {
-		try {
-			SimpleMindMapPart part = (SimpleMindMapPart) getContentViewer().getRootPart().getContentPartChildren()
-					.get(0);
-			ITransactionalOperation op = new GefLayoutOperation(part);
-			domain.execute(op, null);
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
 	}
 }
