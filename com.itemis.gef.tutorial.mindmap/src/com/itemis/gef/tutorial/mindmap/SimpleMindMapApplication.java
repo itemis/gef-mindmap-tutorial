@@ -14,6 +14,7 @@ import com.itemis.gef.tutorial.mindmap.model.SimpleMindMapExampleFactory;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel;
 import com.itemis.gef.tutorial.mindmap.models.ItemCreationModel.Type;
 import com.itemis.gef.tutorial.mindmap.operations.DotLayoutOperation;
+import com.itemis.gef.tutorial.mindmap.operations.ElkLayoutOperation;
 import com.itemis.gef.tutorial.mindmap.operations.GefLayoutOperation;
 import com.itemis.gef.tutorial.mindmap.parts.SimpleMindMapPart;
 import com.itemis.gef.tutorial.mindmap.visuals.MindMapNodeVisual;
@@ -85,7 +86,12 @@ public class SimpleMindMapApplication extends Application {
 			executeOperation(new DotLayoutOperation(getMindmapPart()));
 		});
 
-		return new HBox(10, undoButton, redoButton, treeLayoutButton, circoLayoutButton);
+		Button elkLayoutButton = new Button("Layered Layout");
+		elkLayoutButton.setOnAction((e) -> {
+			executeOperation(new ElkLayoutOperation(getMindmapPart()));
+		});
+
+		return new HBox(10, undoButton, redoButton, treeLayoutButton, circoLayoutButton, elkLayoutButton);
 	}
 
 	/**

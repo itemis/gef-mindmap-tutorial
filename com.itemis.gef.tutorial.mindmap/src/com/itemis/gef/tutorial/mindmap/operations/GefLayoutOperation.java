@@ -52,6 +52,10 @@ public class GefLayoutOperation extends AbstractOperation implements ITransactio
 		this.mindMapPart = part;
 	}
 
+	protected Edge createLayoutEdge(MindMapConnectionPart connection, Node srcNode, Node trgNode) {
+		return new Edge(srcNode, trgNode);
+	}
+
 	/**
 	 * Creating the node and setting the attributes for the layout algorithm.
 	 */
@@ -124,7 +128,7 @@ public class GefLayoutOperation extends AbstractOperation implements ITransactio
 					}
 				}
 
-				Edge edge = new Edge(srcNode, trgNode);
+				Edge edge = createLayoutEdge((MindMapConnectionPart) item, srcNode, trgNode);
 				graph.getEdges().add(edge);
 			}
 		}
@@ -137,12 +141,7 @@ public class GefLayoutOperation extends AbstractOperation implements ITransactio
 		ctx.applyLayout(true);
 
 		// filling the maps for storing initial and final locations
-		layoutNodes.forEach((part, node) -> {
-			initialLocations.put(part, part.getContent().getBounds().getLocation());
-			finalLocations.put(part, LayoutProperties.getLocation(node));
-		});
-
-		layoutNodes.clear();
+		saveInitialAndFinalData(layoutNodes);
 	}
 
 	@Override
@@ -153,6 +152,14 @@ public class GefLayoutOperation extends AbstractOperation implements ITransactio
 			e.getKey().setContentTransform(Geometry2FX.toFXAffine(transform));
 		}
 		return Status.OK_STATUS;
+	}
+
+	protected void saveInitialAndFinalData(Map<MindMapNodePart, Node> layoutNodes) {
+		layoutNodes.forEach((part, node) -> {
+			initialLocations.put(part, part.getContent().getBounds().getLocation());
+			finalLocations.put(part, LayoutProperties.getLocation(node));
+		});
+		layoutNodes.clear();
 	}
 
 	@Override
